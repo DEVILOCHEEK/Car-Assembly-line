@@ -1,0 +1,57 @@
+name: Car Assembly Line
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create build directory
+        run: mkdir build
+
+      - name: Create car assembly file
+        run: |
+          cd build
+          touch car.txt
+          echo "Додаємо кузов" >> car.txt
+          echo "Додаємо двигун" >> car.txt
+          echo "Додаємо колеса" >> car.txt
+          echo "Додаємо двері" >> car.txt
+          echo "Додаємо фари" >> car.txt
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: car-build
+          path: build/
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: car-build
+          path: build/
+
+      - name: Test for body
+        run: grep "кузов" build/car.txt
+
+      - name: Test for engine
+        run: grep "двигун" build/car.txt
+
+      - name: Test for wheels
+        run: grep "колеса" build/car.txt
+
+      - name: Test for doors
+        run: grep "двері" build/car.txt
+
+      - name: Test for headlights
+        run: grep "фари" build/car.txt
